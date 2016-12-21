@@ -9,9 +9,164 @@ It is a good software engineering practice to clearly separate the domain from i
 
 +A simple model with items and an item container.>file://figures/todoUML.png|width=70|label=fig:todoUML+
 
+""==ToDoItem== class."" A todo item is characterized by a title, a due date and a status which indicates whether the item is done.
+
+[[[
+Object subclass: #ToDoItem
+    instanceVariableNames: 'title due done'
+    classVariableNames: ''
+    package: 'ToDo-Model'
+]]]
+
+It has accessor methods for the instance variables ==title==, ==due== and ==done==.
+
+[[[
+ToDoitem >> title
+    ^ title
+]]]
+[[[
+ToDoitem >> title: aString
+    title := aString
+]]]
+[[[
+ToDoItem >> due
+    ^ due
+]]]
+[[[
+ToDoItem >> due: aDate
+    due := aDate asDate
+]]]
+[[[
+ToDoItem >> done
+    ^ done
+]]]
+[[[
+ToDoItem >> done: aBoolean
+    done := aBoolean
+]]]
+
+We specify the default values when a new todo item is created by defining a method ==initialize== as follows:
+
+[[[
+ToDoItem >> initialize
+    self title: 'ToDo Item'.
+    self due: Date tomorrow.
+    self done: false.
+]]]
 
 
+@@note ""A word about ==initialize== and ==new==."" Pharo and Squeak are the only Smalltalk dialect that performs automatic object initialization. This greatly simplifies the definition of classes. If you have defined an ==initialize== method, it will be automatically called when you send the message ==new== to your classes. In addition, the method ==initialize== is defined in the class ==Object== so you can (and are encouraged) to invoke potential ==initialize== methods of your superclasses using ==super initialize== in your own ==initialize== method. If you want to write code that is portable between dialects, you should redefine the method ==new== in all your root classes (subclasses of ==Object==) as shown below and you should ""not"" invoke ==initialize== via a super call in your root classes.
+
+[[[
+ToDoItem class >> new
+    ^ self basicNew initialize
+]]]
+
+In this book we follow this convention and this is why we have not added ==super initialize== in the methods ==ToDoItem>>initialize== and ==ToDoList>>initialize==.
+
+We also add two testing methods to our todo item:
+
+[[[
+ToDoItem >> isDone
+    ^ self done
+]]]
+[[[
+ToDoItem >> isOverdue
+    ^ self isDone not and: [ Date today > self due ]
+]]]
 
 
+""==ToDoList== Class."" We now create a class that will hold a list of todo items. The instance variables will contain a title and a list of items. In addition, we define a ''class variable'' ==Default== that will refer to a singleton of our class.
 
+[[[
+Object subclass: #ToDoList
+   instanceVariableNames: 'title items'
+    classVariableNames: 'Default'
+    package: 'ToDo-Model'
+]]]
 
+You should next add the associated accessor methods ==title==, ==title:==, ==items== and ==items:==. 
+
+The instance variable ==items== is initialized with an ==OrderedCollection== in the ==initialize== method:
+
+[[[
+ToDoList >> initialize
+   self items: OrderedCollection new
+]]]
+
+We define two methods to add and remove items.
+
+[[[
+ToDoList>>add: aTodoItem
+    self items add: aTodoItem
+]]]
+[[[
+ToDoList>>remove: aTodoItem
+   ^ self items remove: aTodoItem
+]]]
+
+Now we define the ''class-side'' method ==default== that implements a lazy initialization of the singleton, initializes it with some examples and returns it. The class-side method ==reset== will reset the singleton if necessary.
+
+[[[
+ToDoList class >> default
+    ^ Default ifNil: [ Default := self new ]
+]]]
+[[[
+ToDoList class >> reset
+   Default := nil
+]]]
+
+Finally, we define a method to add some todo items to our application so that we have some items to work with. 
+
+[[[
+ToDoList class >> initializeExamples
+    "self initializeExamples"
+
+    self default
+        title: 'Seaside ToDo';
+        add: (ToDoItem new
+            title: 'Finish todo app chapter';
+            due: '11/15/2007' asDate;
+            done: false);
+        add: (ToDoItem new
+            title: 'Annotate first chapter';
+            due: '04/21/2008' asDate;
+            done: true);
+         add: (ToDoItem new
+            title: 'Watch out for UNIX Millenium bug';
+            due: '01/19/2038' asDate;
+            done: false)
+]]]
+
+Now evaluate this method (by selecting the ==self initializeExamples== text and selecting ==do it== from the context menu). This will populate our model with some default todo items.
+
+Now we are ready to define our seaside application using this model.
+
+!!! Defining a View
+
+First, we define a component to see the item list. For that, we define a new component named ==ToDoListView==. 
+
+[[[
+WAComponent subclass: #ToDoListView
+    instanceVariableNames: ''
+    classVariableNames: ''
+    package: 'ToDo-View'
+]]]
+
+We can register the application by defining the class method initialize as shown and by executing ToDoListView>>initialize.
+
+[[[
+ToDoListView class >> initialize
+    "self initialize"
+    WAAdmin register: self asApplicationAt: 'todo'
+]]]
+
+You can see that the todo application is now registered by pointing your browser to *http://localhost:8080/config/* as shown in *@fig:todoregistered*.
+
++ The application is registered in Seaside (sd).>file://figures/todoregistered.png|width=40|label=fig:todoregistered+
+
+If you click on the todo link in the config list you will get an empty browser window. This is to be expected since so far the application does not do any rendering. Now if you click on the halo you should see that your application is present on the page as shown in *@fig:halosonemptytodo*.
+
++ Our application is there, but nothing is rendered.>file://figures/halosOnEmptyTodo.png|width=70|label=fig:halosonemptytodo+
+
+Now we are ready to work on the rendering of our component.
