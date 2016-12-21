@@ -1,12 +1,5 @@
-!My First book
 
-!!Compilation
+! Seaside in Action
 
-${inputFile:Chapters/Chapter1/chapter1.pillar}$
+${inputFile:Chapters/4-ASimpleTodoApplication/ASimpleTodoApplication.pillar}$
 
-!!Edition and Templates
-
-${inputFile:Chapters/Chapter2/chapter2.pillar}$
-
-+>figures/pharo.png|width=30+
-+>figures/rmod.png|width=30+

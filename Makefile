@@ -1,7 +1,6 @@
 MAIN = book
 CHAPTERS = \
-	Chapters/Chapter1/chapter1 \
-	Chapters/Chapter2/chapter2
+	Chapters/04-ASimpleTodoApplication/ASimpleTodoApplication 
 
 OUTPUTDIRECTORY = build
 LATEXTEMPLATE = support/templates/main.latex.mustache
