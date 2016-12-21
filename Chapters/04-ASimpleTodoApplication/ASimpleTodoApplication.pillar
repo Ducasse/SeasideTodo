@@ -1,0 +1,17 @@
+!! A Simple ToDo Application
+
+The objective of this chapter is to highlight the important issues when building a Seaside application: defining a model, defining a component, rendering the component, adding callbacks, and calling other components. This chapter will repeat some elements already presented before but within the context of a little application. It is a kind of summary of the previous points.
+
+
+!!! Defining a Model
+
+It is a good software engineering practice to clearly separate the domain from its views. This is a common practice which allows one to change the rendering or even the rendering framework without having to deal with the internal aspects of the model. Thus, we will begin by presenting a simple model for a todo list that contains todo items as shown by Figure *@fig:todoUML*.
+
++A simple model with items and an item container.>file://figures/todoUML.png|width=70|label=fig:todoUML+
+
+
+
+
+
+
+
