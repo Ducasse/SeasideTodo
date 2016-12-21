@@ -327,3 +327,238 @@ ToDoListView>>add
 +Our todo application with add functionality.>file://figures/todoWithAdd.png|width=70|label=fig:todoWithAdd+
 
 
+!!! Adding a Form
+
+We would like to have a ''Save'' button so that we can save our changes. We need to wrap our component in a form in order for this to work correctly (see *ref:/book/fundamentals/forms*). Here is our updated ==renderContentOn:== method:
+
+[[[
+ToDoListView >> renderContentOn: html
+   html heading: self model title.
+    html form: [
+        html anchor 
+             callback: [ self add ];
+             with: 'add'.
+        html unorderedList: [ self renderItemsOn: html ].
+        html submitButton: 'Save' ]
+]]]
+	
+Now we can add a checkbox to change the status of a todo item, see *@fig:todoWithCheckboxes*. 
+
++Our todo application with checkboxes and save buttons.>file://figures/todoWithCheckboxes.png|width=70|label=fig:todoWithCheckboxes+
+
+Note that the value of the checkbox is passed as an argument of the checkbox callback. The callback uses this value to change the status of the todo item. Notice the use of the ==submitButton== to add a submit button in the form.
+
+[[[
+ToDoListView >> renderItem: anItem on: html
+    html listItem
+        class: 'done' if: anItem isDone;
+        class: 'overdue' if: anItem isOverdue;
+        with: [
+            html checkbox
+                value: anItem done;
+                callback: [ :value | anItem done: value ].
+            html render: anItem title.
+            html space.
+            html anchor
+                callback: [ self edit: anItem ];
+                with: 'edit'.
+            html space.
+            html anchor
+                callback: [ self remove: anItem ];
+                with: 'remove' ]
+]]]
+
+!!! Calling other Components
+
+We are ready to create another component and call it. We create a component called ==ToDoItemView== that is used to represent a specific todo item. Let's create a new class that will refer to the item it represents via an instance variable named ==model==.
+
+[[[
+WAComponent subclass: #ToDoItemView
+    instanceVariableNames: 'model'
+    classVariableNames: ''
+    package: 'ToDo-View'
+]]]
+
+We define the corresponding accessor methods.
+[[[
+ToDoItemView >> model
+    ^ model
+]]]
+
+[[[
+ToDoItemView >> model: aModel
+    model := aModel
+]]]
+
+Now we can define the rendering method for our new component. Note that this is a nice example showing the diversity of brushes since we use a different brush for each entity we manipulate.
+
+[[[
+ToDoItemView >> renderContentOn: html
+    html heading: 'Edit'.
+    html form: [
+        html text: 'Title:'; break.
+        html textInput
+            value: self model title;
+            callback: [ :value | self model title: value ].
+        html break.
+        html text: 'Due:'; break.
+        html dateInput
+            value: self model due;
+            callback: [ :value | self model due: value ] ]
+]]]
+
+Finally, we make sure that this new component is used when we edit an item. To do this, we redefine the method ==edit:== of the class ==ToDoListView== so that it calls the new component on the item we want to edit. Note that the method ==call:== takes a component as a parameter and that this component will be displayed in place of the calling component, see *ref:/book/components*.
+
+[[[
+ToDoListView >> edit: anItem
+    self call: (ToDoItemView new model: anItem)
+]]]
+
+If you click on the edit link of an item you will be able to edit the item. You will notice one tiny problem with the editor: we do not yet let users save or commit their changes! We will correct this in the next section.
+
+In the meantime, add a style sheet to make the editor look nice:
+
+[[[
+ToDoItemView >> style
+    ^ 'body {
+    color: #222;
+    font-size: 75%;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+h1 {
+    color: #111;
+    font-size: 2em;
+    font-weight: normal;
+    margin-bottom: 0.5em;
+}'
+]]]
+
+!!! Answer 
+
+We just saw how one component can call another and that the other component will appear in place of the one calling it. How do we give back control to the caller or return a result? The method ==answer:== performs this task. It takes an object that we want to return as a parameter.
+
+Let's demonstrate how to use ${index:WAComponent!answer:}$ ==answer:==. We will add two buttons to the interface of the ==ToDoItemView==: one for cancelling the edit and one to return the modified item. Note that in one case we use a normal ${index:WARenderCanvas!submitButton}$ ==submitButton==, and in the other case we use ${index:WARenderCanvas!cancelButton}$ ==cancelButton==. 
+
+
+@@note Pay attention since the cancel button ''looks'' exactly the same as a submit button, but it avoids processing the input callbacks of the form that would modify our model. This means we don't need to copy the model as we did in *ref:/book/components/calling/answer*.
+
+[[[
+ToDoItemView >> renderContentOn: html
+    html heading: 'Edit'.
+    html form: [
+        html text: 'Title:'; break.
+        html textInput
+            value: self model title;
+            callback: [ :value | self model title: value ].
+        html break.
+        html text: 'Due:'; break.
+        html dateInput
+            value: self model due;
+            callback: [ :value | self model due: value ].
+        html break.
+        html submitButton
+            callback: [ self answer: self model ];
+            text: 'Save'.
+        html cancelButton
+            callback: [ self answer: nil ];
+            text: 'Cancel' ]
+]]]
+		
+		
+""Working directly on the model."" Now the use of the cancel button does solve the problem in the above example, but generally this approach isn't sufficient by itself: when a component returns an answer, you often want to do some additional validation on the potentially invalid object before updating your model.
+
+Therefore, we should also modify the method ==edit:== to edit a ''copy'' of the item and, depending on the returned value of the editor, we should replace the current item with its modified copy. 
+
+[[[
+ToDoListView >> edit: anItem
+    | edited |
+    edited := self call: (ToDoItemView new model: anItem copy).
+    edited isNil
+        ifFalse: [ self model replace: anItem with: edited ]
+]]]
+	
+Add the following method to ==ToDoList==:
+[[[
+ToDoList >> replace: aTodoItem with: anotherItem
+    self items at: (self items indexOf: aTodoItem) put: anotherItem
+]]]
+
+@@note Advanced! ""Magritte Support."" Replacing a copied object works well in our example, but does not if there are other references to the object (because you end up with a new object). One of the advanced features of Magritte (that we present in *ref:/book/advanced/magritte*) is that it uses a ''Memento'' to support the automatic cancellation of  edited objects: in other words, it copies the whole object during the edit operation into an internal data-structure and then edits only this object. As soon as the changes are saved, it walks over the Memento and pushes the changes to the real object. 
+
+
+!!! Embedding Child Components
+
+So far, we have seen how a component displays itself and how a component can invoke another one. This component invocation has behaved like a modal interface in which you can interact only with one dialog at a time. Now, we will demonstrate the real power of Seaside: creating an application by simply plugging together components which may have been independently developed. How do we get several components to display on the same page? By simply having a component identify its subcomponents. This is done by implementing the ${index:WAComponent!children}$ ==children== method.
+
++Getting an editor to edit new item.>file://figures/editorEmbedded.png|width=70|label=fig:editorEmbedded+
+
+Suppose that we would like to add an item to our list. Normally a web application developer would use a single form which would be used both to edit and to add a todo item, but for demonstration purposes we take a different approach. We would like to display the editor below the list. That is, we want to ''embed'' a ==ToDoItemView== in a ==ToDoListView==. Our solution is to allow the user to add an item by pressing a button which will display an editor for the new item, as seen in *ref:editorEmbedded*. 
+
+We begin by adding an instance variable named ==editor== to the ==ToDoListView== class as follows:
+
+[[[
+WAComponent subclass: #ToDoListView
+   instanceVariableNames: 'editor'
+   classVariableNames: ''
+   package: 'ToDo-View'
+]]]
+
+Then, we define the method ==children== that returns an array containing all the subcomponents of our component. This array contains just the element ==editor== since list items are rendered by the list component itself. Note that Seaside automatically ignores component children that are nil, so we don't have to worry if it is not initialized.
+
+
+[[[
+ToDoListView >> children
+    ^ Array with: editor
+]]]
+
+We modify ==renderContentOn:== to add an ''Add'' button and to trigger the add action. Note that when the value of the instance variable ==editor== is nil the rendering does not show anything.
+
+[[[
+ToDoListView >> renderContentOn: html
+    html heading: self model title.
+    html form: [
+        html unorderedList: [ self renderItemsOn: html ].
+        html submitButton
+            text: 'Save'.
+        html submitButton
+            callback: [ self add ];
+            text: 'Add' ].
+    html render: editor
+]]]
+
++With an item added.>file://figures/itemAdded.png|width=70|label=fig:itemAdded+
+
+
+Next we redefine the method ==add== to add a new component. It first creates an instance of ==ToDoItemView== whose model is a newly created todo item.
+
+[[[
+ToDoListView >> add
+    editor := ToDoItemView new model: ToDoItem new
+]]]
+
+
+""Notification of ==answer:== messages.""
+How do we update the todo list model?  Suppose the user cancels the editing. How do we handle that situation?  We need a way to know when a subcomponent executed the method. You can get notified of ${index:WAComponent!answer:}$ ==answer:== execution by using the method ==onAnswer:==. Using ==onAnswer:== involves modifying the ==initialize== method of the parent component to specify what should be done when one of the subcomponents executes ==answer:==. The method ==onAnswer:== requires a block whose argument represents the object that got answered (==parent onAnswer: [ :object | ... ]==).
+
+The ==onAnswer:== block will be executed with the answered object as its argument. Since the editor will return ==nil== when the user cancels editing, we need to check the value passed in. We modify the ==add== method as follows:
+
+[[[
+ToDoListView >> add
+    editor := ToDoItemView new model: ToDoItem new.
+    editor onAnswer: [ :value |
+       value isNil
+           ifFalse: [ self model add: value ].
+       editor := nil ]
+]]]
+   
+ +Our final todo App>file://figures/todoFinal.png|width=70|label=fig:todoFinal+
+ 
+   
+Note that the ''Save'' button is different from the ''Add'' button since the ''Save'' button (so far) does nothing but submit the form. In the AJAX chapter, we will see that this situation can be avoided altogether (see *ref:/book/web-20*).
+
+If you get the error "Children not found while processing callbacks", check that the ==children== method returns all the direct subcomponents. The halos are another good tool for understanding the nesting and structure of components. We suggest you turn on the halos while developing your applications, as seen in *@fig:todoFinal*.
+
+
+!!! Summary
+
+You have briefly reviewed all the key mechanisms offered by Seaside to build a complex dynamic application out of reusable components. You can either invoke another component or compose a component out of existing ones. Each component has the responsibility to render itself and return its subcomponents.
