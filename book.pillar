@@ -1,5 +1,8 @@
+${inputFile:Chapters/Introduction.pillar}$
 
-! Seaside in Action
+%! Getting Started
+%${inputFile:Chapters/01-Pharo/Pharo.pillar}$
 
-${inputFile:Chapters/04-ASimpleTodoApplication/ASimpleTodoApplication.pillar}$
+%! Seaside in Action
+%${inputFile:Chapters/04-ASimpleTodoApplication/ASimpleTodoApplication.pillar}$
 
