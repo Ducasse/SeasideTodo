@@ -20,11 +20,7 @@ minutes.
 
 !!!What is Seaside?
 
-Seaside is a free, open source framework (collection of Pharo classes). The
-developer can use and extend these classes to produce highly dynamic web-based
-''applications''. By applications, we mean real applications with potentially
-complex workflows and user interactions, in contrast to just collections of
-static pages. Seaside makes web development simpler and can help you build
+Seaside is a free, open-source framework to build powerful and dynamic web applications. The developer can use and extend these classes to produce highly dynamic web-based ''applications''. By applications, we mean real applications with potentially complex workflows and user interactions, in contrast to just collections of static pages. Seaside makes web development simpler and can help you build
 applications that are cleaner and easier to maintain because it has:
 
 - a solid component model and callbacks,
@@ -39,15 +35,17 @@ and dynamic applications comparable to widget libraries such as Swing or
 Morphic. What is really powerful is that the control flow of an application is
 written in plain Pharo code.
 
+!!!! A bit of history
 Seaside was originally created by Avi Bryant and Julian Fitzell. It is mature frameworks used by several companies worldwide.
 
+!!!! Features
 Seaside is often described as a ''heretic web framework'' because by design it
 went against what is currently considered best practice for web development -\-
 such as using templates or clean, carefully chosen, meaningful URLs. Seaside
 does not follow REST (Representational State Transfer) by default. Instead, URLs
 hold session key information, and meaningful URLs have to be generated
 explicitly, if needed. Seaside also offers a smooth integration and let you expose 
-functionality via REST. 
+functionality via REST. So you can get the best of both worlds.
 
 When using a template system (PHP, JSP, ASP, ColdFusion, and so on), the logic
 is scattered across many files, which makes the application hard to maintain.
@@ -69,6 +67,7 @@ Pharo.
 
 Now you can also mix Javascript code within Seaside. You can also use different libraries such as Bootstrap, MDL and take advantage of Websockets and others systems such Mustache. 
 
+!!!! Summary
 In summary, several aspects of Seaside's design differ from most mainstream web
 application frameworks. In Seaside
 
@@ -87,7 +86,7 @@ applications allows complex interaction with the user, rather than a simple
 collection of pages.
 
 
-!!! Seaside Applications
+!!! Some Seaside Applications
 With Seaside, you will be able to build any kind of web application. You can see
 some Seaside applications running on the web. You can find more information at
 *http://www.pharo.org/success>http://www.pharo.org/success*. Seaside is used in many
@@ -104,6 +103,10 @@ built with Seaside.
 ; ""Cmsbox"" (*http://www.cmsbox.ch>http://www.cmsbox.ch/*)
 : An AJAX-based content management system designed for usability. Here the navigation is more the kind we expect from a web application.
 
+; ""allstocker"" (*http://www.allstocker.jp>http://www.allstocker.jp/*)
+:  Applications to support the rent of machines. The architecture is explained
+in the blogpost xxx available from *http://pharoweekly.wordpress.com*
+
 There are also several open-source projects based on Seaside; we list two interesting ones, since you may use them when going through the book.
 
 ; ""Pier"" (*http://www.piercms.com>http://www.piercms.com/*)
@@ -112,7 +115,7 @@ There are also several open-source projects based on Seaside; we list two intere
 ; ""SqueakSource"" (*http://www.squeaksource.com>http://www.squeaksource.com/*)
 : SqueakSource is a web-based source management system for Squeak using the Monticello code versioning system and it is more traditional in the kind of flow it presents.
 
-!!What is Pharo?
+!!! What is Pharo?
 
 
 First, the design of Pharo is still one of the best in terms of elegance,
@@ -146,7 +149,7 @@ participate in the community. You can also discuss Seaside development on the Di
 Okay then, you now have tools at your disposal to help you through any problems
 you might encounter.
 
-!!Structure of the Book
+!!!Structure of the Book
 
 ; Getting Started
 : Explains how to get a Seaside application up and running in less than 15 minutes. It will show you some Seaside tools.
@@ -168,7 +171,7 @@ you might encounter.
 
 
 
-!!Formatting Conventions
+!!! Formatting Conventions
 
 We need to say a word about formatting conventions before we proceed. In Pharo,
 as in most Smalltalk implementations, you edit code using a code browser as we
@@ -215,7 +218,7 @@ example, here is the definition of the class method ==canBeRoot==, defined on
 the class ==WebSudoku==:
 
 [[[
-WebSudoku class>>canBeRoot
+WebSudoku class >> canBeRoot
     ^ true
 ]]]
 
@@ -223,9 +226,9 @@ We use the following annotations for specific notes:
 
 @@note This is a side-note and might be interesting to readers more curious about the topic.
 
-@@note This is a remark covering advanced topics. It can be safely skipped on the first pass through the book.
+@@note Advanced This is a remark covering advanced topics. It can be safely skipped on the first pass through the book.
 
-@@note This is an important note, if you do not follow the suggestions you are likely to get into trouble.
+@@note Important This is an important note, if you do not follow the suggestions you are likely to get into trouble.
 
 
 !!! Acknowledgments
