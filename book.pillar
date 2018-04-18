@@ -1,8 +1,14 @@
 ${inputFile:Chapters/Introduction.pillar}$
 
-%! Getting Started
-%${inputFile:Chapters/01-Pharo/Pharo.pillar}$
+! Getting Started
 
-%! Seaside in Action
-%${inputFile:Chapters/04-ASimpleTodoApplication/ASimpleTodoApplication.pillar}$
+This part will show you how to get a simple Seaside application up and running
+in less than 15 minutes. 
+
+If you’re new to Pharo, the instructions for Pharo will introduce you to the Seaside One Click Image, which is designed to get you up and running as quickly as possible.
+
+s${inputFile:Chapters/01-Pharo/Pharo.pillar}$
+
+! Seaside in Action
+${inputFile:Chapters/04-ASimpleTodoApplication/ASimpleTodoApplication.pillar}$
 
