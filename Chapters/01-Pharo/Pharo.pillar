@@ -18,8 +18,7 @@ you can find on the Seaside website at *http://www.seaside.st/download*. The
 +The Seaside development environment.>file://figures/seasideApplicationDesk.png|width=100|label=fig:seasideDesk+
 
 You should see the Seaside development environment open in
-a single window on your desktop similar to the one presented in Figure 
-*@fig:seasileDesk*.
+a single window on your desktop similar to the one presented in Figure *@fig:seasileDesk*.
 
 @@todo revise
 
@@ -84,8 +83,7 @@ Now we will define a new component named ==WebCounter==. In Seaside, a
 @@note It is only a coincidence that this class has the same name as its package. Normally packages will contain several classes, and the package names and class names are unrelated.
 
 To start creating your class, click on the ==WebCounter== package you just
-created. The "class creation template" will
-appear in the source pane of the browser. Edit this template so that it looks as
+created. The "class creation template" will appear in the source pane of the browser. Edit this template so that it looks as
 in the script *@scr:pharoClassTemplate*
 
 [[[language=smalltalk|caption=Pharo class template for the ==Web Counter==|label=scr:pharoClassTemplate
@@ -117,7 +115,7 @@ component.
 
 +The class has been created.>file://figures/createdClass.png|width=100|label=createdClass+
 
-!!!! Defining the Code
+!!! Defining Basic Methods
 @pharoDefineCode
 
 Now we are ready to define some methods for our component. We will define
@@ -163,29 +161,22 @@ the name of the method we are defining. The next line invokes the superclass
 ==initialize== method. The final line sets the value of the count instance
 variable to 0.
 
-To be ready to define Seaside-specific behaviour, now create a new method
-category called actions. From the method category pane bring up the context menu
-and select ''Add category...'' and type the new category actions. In this new
-category define two more instance methods to change the counter state as in
-scripts *@scr:increaseMethod* and *@scr:decreaseMethod*.
+To be ready to define Seaside-specific behaviour, define two more instance methods to change the counter state as in
+scripts *@scr:increaseMethod* and *@scr:decreaseMethod*. You can group them in a protocol 'action'.
 
 [[[language=smalltalk|caption=Increase method.|label=scr:increaseMethod
 
 WebCounter >> increase
     count := count + 1
-
 ]]]
 
 [[[language=smalltalk|caption=Decrease method.|label=scr:decreaseMethod
-
 WebCounter >> decrease
     count := count - 1
-
 ]]]
 
 
-
-!!!! Rendering a Counter
+!!! Rendering a Counter
 @pharoRenderCounter
 
 Now we can focus on Seaside specific methods. We will define the method
