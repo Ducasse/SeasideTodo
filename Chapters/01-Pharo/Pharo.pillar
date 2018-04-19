@@ -150,8 +150,7 @@ code.
 
 +Compiling a method.>file://figures/compilingMethod.png|width=100|label=fig:compilingMethod+
 
-The method signature will also appear in the method pane as shown in Figure
-*@fig:compiledMethod*.
+The method signature will also appear in the method pane as shown in Figure *@fig:compiledMethod*.
 
 +The method has been compiled.>file://figures/compiledMethod.png|width=100|label=fig:compiledMethod+
 
@@ -165,7 +164,6 @@ To be ready to define Seaside-specific behaviour, define two more instance metho
 scripts *@scr:increaseMethod* and *@scr:decreaseMethod*. You can group them in a protocol 'action'.
 
 [[[language=smalltalk|caption=Increase method.|label=scr:increaseMethod
-
 WebCounter >> increase
     count := count + 1
 ]]]
@@ -189,10 +187,8 @@ Add a new method category called rendering, and add the method definition in
 script *@scr:pharoRenderContentOn*
 
 [[[language=smalltalk|caption=Example of ==renderContentOn:== method|label=scr:pharoRenderContentOn
-
 WebCounter>>renderContentOn: html
     html heading: count
-
 ]]]
 
 We want to display the value of the variable count by using an HTML heading tag.
@@ -211,16 +207,13 @@ We will now register our component as an application so that we can access it
 directly from the web browser. To register a component as an application, we
 need to send the message ==register:asApplicationAt:== to ==WAAdmin==.
 
-==WAAdmin register: WebCounter asApplicationAt: 'webcounter'== will register the
-component ==WebCounter== as the application named ==webcounter==. The argument
+[[[
+==WAAdmin register: WebCounter asApplicationAt: 'webcounter'==
+]]]
+This expression registers the component ==WebCounter== as the application named ==webcounter==. The argument
 we add to the ==register:asApplicationAt:== message specifies the root component
 and the path that will be used to access the component from the web browser. You
 can reach the application under the URL *http://localhost:8080/webcounter*.
-
-Use ''World'' | ''Workspace'' to open a workspace, which is an area where you
-can run snippets of code. Type the text shown above, then select it with the
-mouse and bring up the context menu and select ''Do it (d)'', alternatively use
-the keyboard shortcut.
 
 +Register a component as an application from a workspace.>file://figures/registerComponent.png|width=100|label=fig:registerComponent+
 
@@ -245,10 +238,8 @@ loaded from a file. The script *@scr:classInitialize* the ==initialize== class
 method definition.
 
 [[[language=smalltalk|caption=Automitically register your application with an initialize method.|label=scr:classInitialize
-
 WebCounter class >> initialize
     WAAdmin register: self asApplicationAt: 'webcounter'
-
 ]]]
 
 The word "class" in the ==WebCounter class>>== first line indicates that this
@@ -258,26 +249,16 @@ Because this code is in the ==WebCounter== class, we can use the term self in
 place of the explicit reference to ''WebCounter'' that we used in the previous
 section. In Smalltalk we avoid hardcoding class names whenever possible.
 
-Let’s implement the method. Select the class ==WebCounter==, click on the
-''Class'' button under the class pane. You are now browsing the class methods of
-the class ==WebCounter== (and there are none yet). Define a method category as
-we did previously: click on the third pane and bring up the context menu. From
-this menu, select the menu item add category, and from the list select or type
-==class initialization==. Then in the bottom pane define and accept the method
-==initialize== as shown in Figure *@fig:compilingClassMethod*.
-
-+Compiling a class method.>file://figures/compilingClassMethod.png|width=100|label=compilingClassMethod+
-
 In the future, we will add configuration parameters to this method, so it is
 important to be familiar with creating it. Remember that this method is executed
 automatically only when the class is loaded into memory from some external
 file/source. So if you had not already executed
 ==WAAdmin register: WebCounter asApplicationAt: 'webcounter'== Seaside would
 still not know about your application. To execute the ==initialize== method
-manually, type ==WebCounter initialize== in a workspace; your application will
+manually, execute ==WebCounter initialize== in a workspace; your application will
 be registered and you will be able to access it in your web browser.
 
-@@important Automating the configuration of your Seaside application via class-side ==initialize== methods play an important role in building deployable Smalltalk images because of their role when packages are brought into base images, and is a useful technique to bear in mind for future use.
+@@note Important Automating the configuration of your Seaside application via class-side ==initialize== methods play an important role in building deployable images because of their role when packages are brought into base images, and is a useful technique to bear in mind for future use.
 
 The following Figure *@fig:executableComment*  shows a trick Smalltalkers
 often use: it adds the expression to be executed as comment in the method. This
@@ -289,8 +270,8 @@ select the expression and execute it using the ''Do it (d)'' menu item or shortc
 !!!! Adding Behavior
 @pharoAddBehavior
 
-Now we can add some actions to our component. We will start with a very simple
-change; we will let the user change the value of the count variable by defining
+Now we can add some actions to our component. We start with a very simple
+change; we  let the user change the value of the count variable by defining
 callbacks attached to links (also known as anchors) displayed when the component
 is rendered in a web browser, as shown in Figure *@fig:addLink*. Using callbacks
 allows us to define some code that will be executed when a link is clicked.
@@ -301,7 +282,6 @@ We modify the method ==WAComponent>>renderContentOn:== as in script
 *@scr:addCallback*.
 
 [[[language=smalltalk|caption=Add anchors and callbacks to your counter|label=scr:addCallback
-
 WebCounter >> renderContentOn: html
     html heading: count.
     html anchor
@@ -315,14 +295,14 @@ WebCounter >> renderContentOn: html
 
 @@note Don’t forget that ==WAComponent>>renderContentOn:== is on the ''instance'' side.
 
-Each callback is given a Smalltalk block: an anonymous method (strictly, a
+Each callback is given a Pharo block: an anonymous method (strictly speaking, a
 ''lexical closure'') delimited by [ and ]. Here we send the message
 ==callback:== (to the result of the anchor message) and pass the block as the
 argument. In other words, we ask Seaside to execute our callback block whenever
 the user clicks on the anchor.
 
 Click on the links to see that the counter get increased or decreased as shown
-in Figure *fig:callbackResult*.
+in Figure *@fig:callbackResult*.
 
 +A simple counter with a different value.>file://figures/callbackResult.png|width=100|label=fig:callbackResult+
 
@@ -330,64 +310,23 @@ in Figure *fig:callbackResult*.
 @pharoClassComment
 
 A class comment (along with method comments) can help other developers
-understand a class. With your ==WebCounter== class selected, press the class
-comment button ==?== in the class browser. The code pane in the browser will now
-show a class comment template. Delete this template and enter the comment shown
-in Figure *fig:classComment*. Use the context menu ''Accept (s)'' item to save
-your comment.
+understand a class. Do not forget to add a nice comment to your class and save it using your 
+favorite version control system. 
 
-When you’re studying a Smalltalk framework, class comments are a pretty good
+When you’re studying a framework, class comments are a pretty good
 place to start reading. Classes that don’t have them require a lot more
 developer effort to figure out so get in the habit of adding these comments to
 all of your classes.
 
 +A class comment.>file://figures/classComment.png|width=100|label=fig:classComment+
 
-!!! Saving your Package to Monticello
-@pharoMonticello
-
-The Smalltalk image is a great place to work with live objects. It has a few
-drawbacks though, so it is useful to have some way to store your Smalltalk code
-in traditional files or on a server to share with others. Pharo uses the
-Monticello (*http://www.wiresong.ca/Monticello/*) source code control system for
-this purpose. Monticello stores code in repositories. These repositories can be
-network servers, databases, email, or just simple directories on a disk. We will
-create a directory repository so that Monticello can store your packages in
-files on your disk.
-
-;Open Monticello
-:You can open Monticello by using ''World'' | ''Monticello Browser''. You will see two main panes. The left hand pane shows packages installed in your image, and the right hand pane shows the repositories those packages came from.
-
-;Create your package
-:First create a package for your code, by pressing the +Package button. You should call your package ''WebCounter'' to ensure that it is automatically associated with the class category of the same name that you have already created.
-
-;Create a repository
-:Next, create a directory on your hard drive where you would like to store your Smalltalk source code. Now, in the Monticello browser in Pharo make sure no package is selected in the package pane. Click on the +Repository button and pick "Directory" from the resulting popup menu. You will be presented with a file/directory browser. Navigate to, and select, the directory you created. You should see this directory listed in the repository pane of the Monticello browser. Make sure this new repository is highlighted and select ''add to package...'' from the repository pane context menu. Select the ==WebCounter== package from the resulting menu. You will need to navigate past a large number of package names to find the ==WebCounter== package.
-
-+Monticello Browser.>file://figures/monticelloBrowser.png|width=100|label=fig:monticelloBrowser+
-
-;Publishing your package
-:With all of this setup out of the way you can now save your package to the repository by selecting your package in the package pane, selecting your new repository in the repository pane and pressing Save. You will be asked to include a comment. Normally you indicate in a few words what you changed since the last time you saved the package. For now we just enter "initial dump" and press ''Accept''.
-
-Normally you would publish a package any time you have made significant changes
-to it. That way if your image should become corrupted you can load the code from
-your last saved version.
-
-Monticello can also be used to facilitate having multiple developers work
-simultaneously on a single package of code. For this you need a FTP or HTTP
-repository like SqueakSource. We will not discuss this advanced usage here,
-though.
-
-;Loading packages
-:Once your package has been published to a Monticello repository, it can be loaded into any Pharo image. To load your package into an image, first make sure that your repository is listed in this new image. If it isn’t, repeat the steps listed in ''Create'' a repository above. Now, in the Monticello browser, select your repository in the right pane and press ''Open''. You will be presented with a repository browser such as the one shown in Figure *@fig:repositoryBrowser*. In the left pane, select the ==WebCounter== package; in the right pane select the version; and then click ''Load''.
-
-+Monticello Repository Browser.>file://figures/repositoryBrowser.png|width=100|label=fig:repositoryBrowser+
+Now you are set to code in Seaside. 
 
 !!! Summary
 @pharoSummary
 
-You have now learned how to define a component, register it, modify it and save
-your code to a file. Now you are ready to proceed to Part II to learn all the
+
+You have now learned how to define a component, register it and modify it. Now you are ready to proceed to Part II to learn all the
 details of using Seaside to build powerful web applications.
 
 
