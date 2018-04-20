@@ -1,0 +1,108 @@
+!!Rendering Components 
+@cha:gettingstarted-pharo
+
+In this chapter, you will learn the basics of displaying text and other information such as tables and lists with Seaside and its powerful XHTML manipulation interface. You will learn how to create a ''component'' which could include text, a form, a picture, or anything else that you would like to display in a web browser. Seaside's component framework is one of its most powerful features and writing an application in Seaside amounts to creating and manipulating components. You will learn how to use Seaside's API, which is based on the concept of ``brushes\'', to generate valid XHTML.
+
+!!!Brush concept
+
+One of the great features of Seaside is that you do not have to worry about manipulating HTML yourself and creating valid XHTML.  Seaside produces valid XHTML: it automatically generates HTML markup using valid tags, it ensures that the tags are nested correctly and it closes the tags for you.  
+
+Let's look at a simple example: to force a line-break in HTML (for instance, to separate the lines of a postal address) you need to use a break tag: ==<br/>==. Some people use ==<br>== or ==<br></br>==, and neither is valid in XHTML. Some browsers will accept these incorrect forms without a problem, but some will mark them as errors. If your content is getting passed on through RSS or Atom clients, it may fail in unexpected ways. You do not need to worry about any of this when using Seaside.
+
+The basic metaphor used in Seaside for rendering HTML is one of painting on a ''canvas'' using ''brushes''. Methods such as ==renderContentOn:== that are called to render content are passed an argument (by convention named ==html==) that refers to the current canvas object. To render content on this object you can call its methods (or to use the correct Smalltalk terminology, you can pass it messages). In the simple example given above, to add a line-break to a document you would use ==html break==. 
+
+When you send a message to the canvas, you're actually asking it to start using a new ''brush''. Each brush is associated with a specific type of HTML tag, and can be passed arguments defining more detail of what you want to be rendered. So to write out a paragraph of text, you would use ==html paragraph with: 'This is the text'==. This tells the canvas to start using the paragraph brush (which causes ==<p>== to be output), then output the text passed as the argument, and finally to finish using the brush (which causes ==</p>== to be output).
+
+Many brushes can be passed multiple messages before they are finished, by chaining the messages together with ==;== (this is called ''cascading'' messages in Pharo). For example, a generic ''heading'' exists which can be used to generate HTML headings at various levels, by passing it a ==level:== message with an argument specifying the level of heading required:
+
+[[[
+html heading
+   level: 3;
+   with: 'A third level heading'.
+]]]
+
+This will produce the HTML:
+
+=<h3>A third level heading</h3>
+
+You can cascade as many messages as you need to each brush object.
+
+You can easily tell Seaside to nest tags by using Pharo blocks:
+
+[[[
+html paragraph: [
+    html text: 'The next word is '.
+    html strong: 'bold' ].
+]]]
+
+This will produce the HTML:
+
+[[[
+<p>The next word is <strong>bold</strong></p>
+]]]
+
+Note that we've used a very handy shortcut here: many of the brush methods have an equivalent method that can be called with a single argument so instead of typing ==html paragraph with: 'text'== you need only type ==html paragraph: 'text'==.
+
+This is a very brief introduction that will allow you to begin to experiment with how these techniques can be combined into a larger piece of content, as you will see in the following sections. 
+
+
+!!! First component: Hello World
+Our first Seaside component will simply display ''Hello world''. Begin by creating a package called 'SeasideBook-Hello' and then create the class ==ScrapBook== as a subclass of ==WAComponent== as shown below.
+
+[[[
+WAComponent subclass: #ScrapBook
+    instanceVariableNames: ''
+    classVariableNames: ''
+    package: 'SeasideBook-Hello'
+]]]
+
+When we use the term ''component'' in this text we generally mean an instance of a subclass of ==WAComponent==. For now, just think of subclasses of ==WAComponent== as ``visual components\''. When it is time for a component to be displayed, Seaside sends it the message  ==WAComponent>>renderContentOn:== with a single argument (by convention called ==html==) which is an instance of the class ==WARenderCanvas== (the ``canvas\''). Think of the canvas as the medium on which you will paint your component. It provides a transparent interface to XHTML which makes it easy to produce text, anchors, images etc., in a modular way (i.e., attached to each component of your application). To start, we just want to show a simple text message. Fortunately the canvas supports a ==text:== message for just this purpose, which we can use as shown below.
+
+@@note Important Note that all the classes in Seaside are prefixed with ==WA== which acts as a namespace. Do not use this prefix for your components. ==WA== is intended for Seaside framework classes.
+
+[[[
+ScrapBook >> renderContentOn: html
+   html text: 'Hello world'
+]]]
+
+Great, we have a component but how do we get Seaside to serve it? For now, evaluate the following code in a workspace:
+
+[[[
+WAAdmin register: ScrapBook asApplicationAt: 'hello'
+]]]
+
+Now open your web browser and go to *http://localhost:8080/hello*, and you should see something very like *ref:helloworld*.
+
++Hello World component.>file://figures/hello-world.png|width=100|label=fig:seasideDesk+
+
+Seaside added XHTML markup for the skeletal structure of an XHTML document (==html==, ==head== and ==body== tags). OK, so what is happening here? Grossly simplified: When we request this URI, Seaside creates a new instance of our class for us and then sends it  ==WAComponent>>renderContentOn:==. After being placed inside a skeleton XHTML document, the XHTML painted onto the canvas is then returned to the web browser to be displayed.
+
+@@note Important Never invoke the method ==renderContentOn:== directly, Seaside will do it for you.
+
+You will never need to send your component the message ==WAComponent>>renderContentOn:== since the Seaside framework takes care of that for you.  When it is time to paint your component, Seaside sends it ==renderContentOn:==.  This is very similar to models used in most GUI frameworks where a component (or window) is told to paint itself whenever the windowing system deems necessary. Also, keep this in mind as you work with Seaside: a rendering method is just for displaying a component not changing its state.
+
+@@note Important Your rendering method is just for painting the current state of your component, it shouldn't be concerned with changing that state.
+
+
+
+
+
+
+
+
+!!! Getting Seaside
+@pharoOneClickImage
+
+In this book, we use Seaside 3.0.4, included in the ''One Click Image'' which
+you can find on the Seaside website at *http://www.seaside.st/download*. The
+''One Click Image'' is a bundle of everything you need to run Seaside. 
+
+%+The Seaside development environment.>file://figures/seasideApplicationDesk.png|width=100|label=fig:seasideDesk+
+
+[[[language=smalltalk|label=scr:startServer|caption=Stop the server and start a new one.
+
+WAKom stop.
+WAKom startOn: 8081.
+
+]]]
+
