@@ -121,63 +121,155 @@ Your component is now displayed in the web browser but it is decorated with a bo
 
 
 
+!!! More fun with the Seaside Canvas
 
+Now let's have even more fun.  Since Seaside uses plain Pharo
+rather than templates to build web pages, we can use Pharo to
+build the logic of our rendering method.  We are only limited by our imagination and artistic taste.  For example, suppose that we want to display 10 Seaside logos.  We can simply use the ==timesRepeat:== Smalltalk loop as shown in the next method.  See the output in *@ref:10images*.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-!!! Getting Seaside
-@pharoOneClickImage
-
-In this book, we use Seaside 3.0.4, included in the ''One Click Image'' which
-you can find on the Seaside website at *http://www.seaside.st/download*. The
-''One Click Image'' is a bundle of everything you need to run Seaside. 
-
-%+The Seaside development environment.>file://figures/seasideApplicationDesk.png|width=100|label=fig:seasideDesk+
-
-[[[language=smalltalk|label=scr:startServer|caption=Stop the server and start a new one.
-
-WAKom stop.
-WAKom startOn: 8081.
-
+[[[
+ScrapBook >> renderContentOn: html
+    html paragraph: 'Fun with Smalltalk and Seaside.'.
+    html paragraph: [
+        10 timesRepeat: [
+            html image
+                url: 'http://www.seaside.st/styles/logo-plain.png';
+                width: 50 ] ]
 ]]]
+
++Using Pharo to write a loop in our rendering method.>file://figures/10images.png|width=100|label=ref:10images+
+
+Since we're writing in Pharo, changes are easy.  In the next example, we added a horizontal rule inside the loop but noticed that it didn't look very nice (see *@ref:10images-vertical*), so we moved it outside the loop (see *@ref:10images-horizontal*).
+
+[[[
+ScrapBook >> renderContentOn: html
+   html paragraph: 'Fun with Smalltalk and Seaside.'.
+   html paragraph: [
+        10 timesRepeat: [
+            html image
+                url: 'http://www.seaside.st/styles/logo-plain.png';
+                width: 50.
+            html horizontalRule ] ]
+]]]
+
+[[[
+ScrapBook>>renderContentOn: html
+    html paragraph: 'Fun with Smalltalk and Seaside.'.
+    html paragraph: [
+        10 timesRepeat: [
+            html image
+                url: 'http://www.seaside.st/styles/logo-plain.png';
+                width: 50 ].
+        html horizontalRule ]
+]]]
+
++ScrapBook with vertical elements. >file://figures/10imagesHR.png|width=100|label=ref:10images-vertical+
+
+
+
++ScrapBook with horizontal elements.>file://figures/10imagesHR2.png|width=100|label=ref:10images-horizontal+
+
+
+Using Seaside's canvas and brushes eliminates many of the errors that occur when manually manipulating tags.
+
+
+
+!!! Rendering Objects
+
+Let's take a moment to step back and review what we have learnt. Consider the following method:
+
+[[[
+ScrapBook>>renderContentOn: html
+    html paragraph: 'A plain text paragraph.'.
+    html paragraph: [
+        html render: 'A paragraph with plain text followed by a line break. '.
+        html break.
+        html emphasis: 'Emphasized text '.
+        html render: 'followed by a horizontal rule.'.
+        html horizontalRule.
+        html render: 'An image URI: '.
+        html image url: 'http://www.seaside.st/styles/logo-plain.png' ]
+]]]
+
+
+There are four patterns that appear in this method.
+
+# ==render: renderableObject==. This message adds the renderable object to the content of the component. It doesn't use any brushes, it just tells the object to render itself. 
+# Message with zero or one argument. These create brushes. Just as a painter is able to use different tools to paint on a canvases, brushes represent the various tags we can use in XHTML, so ==horizontalRule== will produce the tag ==hr==. Some brushes take an argument such as ==emphasis:== other don't. Section *@ref:/book/fundamentals/rendering-components/brush-structure* will cover this in depth. 
+# Composed messages. The expression ==html image== creates an image brush, and then sends it a ==url:== message to configure its attributes.
+# Block passed as arguments. Using a block (code delimited by ==[== and ==]==) allows us to say that the actions in the block are happening in the context of a given tag. In our example, the second paragraph takes an argument. It means that all the elements created within the block will be contained within the paragraph.
+
+""About the ==render:== message."" As you saw, we use the message ==render:== to render objects. Modify the method ==renderContentOn:== of your ScrapBook component as follows.
+
+[[[
+ScrapBook >> renderContentOn: html
+    html paragraph: [
+        html render: 'today: '.
+        html render: Date today ]
+]]]
+
+Refresh your web browser, see *@ref:date*. The method==renderContentOn:== renders a string and the object representing the current date. It uses the method ==render:==. Most of the time you will use the method ==render:== to render objects or other components, see *ref:/book/components/embedding*.
+
+
++Rendering object with the ==render:== method.>file://figures/date.png|width=100|label=ref:date+
+
+
+We use a block as the argument of the ==paragraph:== because we want to specify that the string =='today '== and the textual representation of the current date are both within a paragraph. Seaside provides a shortcut for doing this. If you are sending only the message ==render:== inside a block, just use the renderable object as a parameter instead of the block. The following two methods are equivalent and we suggest you to use the second form, see *@ref:compact*.
+
+Two equivalent methods.
+
+[[[
+ScrapBook >> renderContentOn: html
+    html paragraph: [ html render: 'today: ' ]
+]]]
+
+[[[
+ScrapBook >> renderContentOn: html
+    html paragraph: 'today: '
+]]]
+
++Rendering object with the ==render:== method.>file://figures/compact.png|width=100|label=ref:date+
+
+
+""About the method ==text:=="". You may see some Seaside code using the message ==WAHtmlCanvas>>text:== as follow.
+
+[[[
+renderContentOn: html
+    html text: 'some string'.
+    html text: Date today.
+]]]
+
+The method ==text:== produces the string representation of an object, as would be done in an inspector. You can pass any object and by default its textual representation will be rendered. In Pharo and GemStone the method ==text:== will call the method  ==Object>>asString==. In any case, the string representation is generated by sending the message ==Object>>printOn:== to that object. ==html text: anObject== is an efficient short hand for the expression ==html render: anObject asString== in Pharo.
+
+""About the method ==renderOn:=="". If you browse the implementation of  ==WAHtmlCanvas>>render:== you will see that ==render:== calls ==renderOn:==. Do not conclude that you can send ==renderOn:== in your ==renderContentOn:== method.  ==Object>>renderOn:== is an internal method which is part of a double dispatch between the canvas and an object it is rendering. Do not invoke it directly!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
