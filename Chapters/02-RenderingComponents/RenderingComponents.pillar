@@ -228,7 +228,7 @@ ScrapBook >> renderContentOn: html
     html paragraph: 'today: '
 ]]]
 
-+Rendering object with the ==render:== method.>file://figures/compact.png|width=100|label=ref:date+
++Two equivalent forms.>file://figures/brushPrincipleRender.pdf|width=100|label=ref:compact+
 
 
 ""About the method ==text:=="". You may see some Seaside code using the message ==WAHtmlCanvas>>text:== as follow.
@@ -244,8 +244,91 @@ The method ==text:== produces the string representation of an object, as would b
 ""About the method ==renderOn:=="". If you browse the implementation of  ==WAHtmlCanvas>>render:== you will see that ==render:== calls ==renderOn:==. Do not conclude that you can send ==renderOn:== in your ==renderContentOn:== method.  ==Object>>renderOn:== is an internal method which is part of a double dispatch between the canvas and an object it is rendering. Do not invoke it directly!
 
 
+!!! Brush Structure
+
+In the previous section you played with several brushes and painted a canvas with them. Now we will explain in detail how brushes work. A canvas provides a simple pattern for creating and using these brushes as shown in *@ref:brush-principle*.
+
+# Tell the canvas what type of brush you are using.
+# Configure the brush, specifying any special options that it may use.
+# Render the contents of this brush. This is often done by passing an object such as a string or a block to ==with:==. 
+
+@@note It is not always necessary to send a brush the ==with:== message. Do so only if you want to specify the contents of the body of the XHTML tag. Since this message causes the XHTML tag to be rendered, it should be sent ''last''.
+
++Select brush, configure it, and render it.>file://figures/brushPrinciple.pdf|width=100|label=ref:brushPrinciple+
 
 
+Here is an example:
+
+[[[
+html heading level: 1; with: 'Hello world'.
+]]]
+
+produces the following XHTML
+
+[[[
+<h1>Hello world</h1>
+]]]
+
+In this example
+
+# We first specify the brush (tag) we are using with ==html heading==.
+# We then send that brush the ==level: 1== message to indicate that this should be a level 1 heading.
+# We tell the brush the contents of the heading and cause it to be rendered using ==with:==.
+
+Here are some examples that show that it is not necessary to use ==with:== if you do not specify the attributes of the brush.
+
+""Just a brush""
+[[[
+html paragraph
+]]]
+''produces''
+[[[
+<p></p>
+]]]
+
+""A brush with implicit content""
+
+[[[
+html paragraph: 'foo'
+]]]
+''produces'' 
+[[[
+<p>foo</p>
+]]]
+
+""Setting the content explicitly""
+
+[[[
+html paragraph with: 'foo'
+]]]
+''produces'' 
+[[[
+<p>foo</p>
+]]]
+
+""Setting attributes directly""
+[[[
+html paragraph class: 'cool'; with: 'foo'
+]]]
+''produces'' 
+[[[
+<p class="cool">foo</p>
+]]]
+
+If no configuration of the brush is necessary, it is usually possible to specify it with a keyword parameter which becomes the contents of the tag. Thus the two following expressions are equivalent
+
+[[[
+html heading level: 1; with: 'Hello world'.
+html heading: 'Hello World'.
+]]]
+since level 1 is the default level for a heading.
+
+As you can see, there are two cases where you can write more compact code. These are summarized in *@ref:brush-principle-compact*. There is a style checking tool called Slime that checks for such cases. Slime is explained in *ref:/book/components/slime*.
+
+
++Select brush, configure it, and render it.>file://figures/brushPrincipleCompact2.pdf|width=100|label=ref:brush-principle-compact+
+
+The next section will show you what the other brushes are and how to find information about them within Seaside.
 
 
 
